@@ -4,9 +4,11 @@
 #include <string>
 #include <vector>
 
+#define DEFAULT_SIZE 1000
+
 int main(int argc, char *argv[]) {
   std::vector<uint64_t> bits;
-  int n = 1000;
+  int n = DEFAULT_SIZE;
 
   if (argc > 1) {
     try {
