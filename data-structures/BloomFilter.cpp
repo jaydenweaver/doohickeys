@@ -26,6 +26,7 @@ optimal number of hash functions is calculated via the following:
 #include <cmath>
 #include <cstdint>
 #include <functional>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -55,7 +56,11 @@ BloomFilter::BloomFilter(int n, double p)
           static_cast<int>(std::ceil(-((n * std::log(p)) / LN_2_SQUARED)))),
       num_hashes(
           static_cast<int>(std::ceil(((double)bit_array_size / n) * LN_2))),
-      buckets((bit_array_size + 63) / 64), bits(buckets) {}
+      buckets((bit_array_size + 63) / 64), bits(buckets) {
+  if (n <= 0 || p <= 0.0 || p >= 1.0) {
+    throw std::invalid_argument("Invalid input: n must be > 0, 0 < p < 1");
+  }
+}
 
 std::vector<uint64_t>
 BloomFilter::get_hash_indexes(const std::string &value) const {
