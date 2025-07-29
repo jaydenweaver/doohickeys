@@ -1,3 +1,5 @@
-hello!
+a collection of my data structure implementations
 
-welcome to my doohickey collection :)
+have currently completed:
+- bloom filter
+- counting bloom filter
