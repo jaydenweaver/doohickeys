@@ -1,3 +1,25 @@
+/*
+
+BLOOM FILTER IMPLEMENTATION
+---------------------------------------------------------
+
+optimal bit array size is calculated via the following, where:
+
+m = bit array size
+n = input size
+p = false positive probability
+
+m = (-n * ln(p)) / ln(2)^2
+
+NOTE:
+p value of:
+0.1 = ~5 bits per element
+0.01 = ~10 bits per element
+0.001 = ~14 bits per element
+0.0001 = ~19 bits per element
+
+*/
+
 #include <cstdint>
 #include <iostream>
 #include <stdexcept>
@@ -5,7 +27,7 @@
 #include <vector>
 
 #define DEFAULT_N 1000
-#define DEFAULT_BITS 1000000
+#define DEFAULT_P 0.001
 
 bool parse_arg(const char *arg, int &n);
 
