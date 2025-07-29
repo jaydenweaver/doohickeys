@@ -39,7 +39,6 @@ constexpr double LN_2 = 0.69314718056;
 constexpr double LN_2_SQUARED = 0.48045301391;
 
 class BloomFilter {
-
 private:
   std::vector<uint64_t> bits;
   int bit_array_size;
