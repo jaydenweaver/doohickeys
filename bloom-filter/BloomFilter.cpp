@@ -23,16 +23,28 @@ optimal number of hash functions is calculated via the following:
 
 */
 
+#include <cmath>
 #include <cstdint>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
-#define DEFAULT_N 1000
-#define DEFAULT_P 0.001
+constexpr int DEFAULT_N = 1000;
+constexpr double DEFAULT_P = 0.001;
+
+constexpr double LN_2 = 0.69314718056;
+constexpr double LN_2_SQUARED = 0.48045301391;
 
 bool parse_arg(const char *arg, int &n);
+
+int get_bit_array_size(const int &n, const double &p) {
+  return static_cast<int>(std::ceil(-((n * std::log(p)) / LN_2_SQUARED)));
+}
+
+int get_num_hashes(const int &m, const int &n) {
+  return static_cast<int>(std::ceil(((double)m / n) * LN_2));
+}
 
 int main(int argc, char *argv[]) {
   std::vector<uint64_t> bits;
@@ -57,8 +69,8 @@ bool parse_arg(const char *arg, int &n) {
     return false;
   }
 
-  if (n < 0) {
-    std::cerr << "'n' cannot be negative!" << std::endl;
+  if (n < 1) {
+    std::cerr << "'n' must be greater than 0!" << std::endl;
     return false;
   }
 
