@@ -29,9 +29,6 @@ optimal number of hash functions is calculated via the following:
 #include <string>
 #include <vector>
 
-constexpr int DEFAULT_N = 1000;
-constexpr double DEFAULT_P = 0.001;
-
 constexpr double LN_2 = 0.69314718056;
 constexpr double LN_2_SQUARED = 0.48045301391;
 
