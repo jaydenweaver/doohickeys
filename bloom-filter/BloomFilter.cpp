@@ -38,18 +38,37 @@ constexpr double DEFAULT_P = 0.001;
 constexpr double LN_2 = 0.69314718056;
 constexpr double LN_2_SQUARED = 0.48045301391;
 
+class BloomFilter {
+
+private:
+  std::vector<uint64_t> bits;
+  int bit_array_size;
+  int num_hashes;
+  int buckets;
+
+  std::vector<uint64_t> get_hash_indexes(const std::string &value,
+                                         int num_hashes, int bit_array_size);
+
+public:
+  BloomFilter(int n, double p);
+
+  void insert(const std::string &value);
+  bool contains(const std::string &value) const;
+};
+
 bool parse_arg(const char *arg, int &n);
 
-int get_bit_array_size(const int n, const double p) {
-  return static_cast<int>(std::ceil(-((n * std::log(p)) / LN_2_SQUARED)));
+BloomFilter::BloomFilter(int n, double p) {
+  bit_array_size =
+      static_cast<int>(std::ceil(-((n * std::log(p)) / LN_2_SQUARED)));
+  num_hashes = static_cast<int>(std::ceil(((double)bit_array_size / n) * LN_2));
+  buckets = (bit_array_size + 63) / 64;
 }
 
-int get_num_hashes(const int m, const int n) {
-  return static_cast<int>(std::ceil(((double)m / n) * LN_2));
-}
-
-std::vector<uint64_t> get_hash_indexes(const std::string &value, int num_hashes,
-                                       int bit_array_size) {
+// uses a standard double hash
+std::vector<uint64_t> BloomFilter::get_hash_indexes(const std::string &value,
+                                                    int num_hashes,
+                                                    int bit_array_size) {
   std::vector<uint64_t> indexes;
   indexes.reserve(num_hashes);
 
@@ -72,17 +91,6 @@ int main(int argc, char *argv[]) {
     if (!parse_arg(argv[1], n))
       return EXIT_FAILURE;
   }
-
-  const int bit_array_size = get_bit_array_size(n, p);
-  const int num_hashes = get_num_hashes(bit_array_size, n);
-  const int buckets = (bit_array_size + 63) / 64;
-
-  std::vector<uint64_t> bits(buckets);
-
-  std::cout << "n: " << n << ", bit array size: " << bit_array_size
-            << ", hashes: " << num_hashes << ", buckets: " << buckets
-            << std::endl;
-
   return 0;
 }
 
