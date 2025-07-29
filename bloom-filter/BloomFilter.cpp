@@ -47,16 +47,24 @@ int get_num_hashes(const int &m, const int &n) {
 }
 
 int main(int argc, char *argv[]) {
-  std::vector<uint64_t> bits;
   int n = DEFAULT_N;
   double p = DEFAULT_P;
+
   if (argc > 1) {
     if (!parse_arg(argv[1], n))
       return 0;
   }
-  std::cout << "n: " << n << ", bit array size: " << get_bit_array_size(n, p)
-            << ", hashes: " << get_num_hashes(get_bit_array_size(n, p), n)
+
+  const int bit_array_size = get_bit_array_size(n, p);
+  const int num_hashes = get_num_hashes(bit_array_size, n);
+  const int buckets = std::ceil((double)bit_array_size / 64);
+
+  std::vector<uint64_t> bits(buckets);
+
+  std::cout << "n: " << n << ", bit array size: " << bit_array_size
+            << ", hashes: " << num_hashes << ", buckets: " << buckets
             << std::endl;
+
   return 0;
 }
 
