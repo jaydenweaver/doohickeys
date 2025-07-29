@@ -1,6 +1,6 @@
 /*
 
-BLOOM FILTER IMPLEMENTATION
+BLOOM FILTER IMPLEMENTATION - currently only supports strings
 ---------------------------------------------------------
 
 optimal bit array size is calculated via the following:
@@ -58,7 +58,7 @@ BloomFilter::BloomFilter(int n, double p)
           static_cast<int>(std::ceil(((double)bit_array_size / n) * LN_2))),
       buckets((bit_array_size + 63) / 64), bits(buckets) {
   if (n <= 0 || p <= 0.0 || p >= 1.0) {
-    throw std::invalid_argument("Invalid input: n must be > 0, 0 < p < 1");
+    throw std::invalid_argument("invalid input: n must be > 0, 0 < p < 1");
   }
 }
 
@@ -71,8 +71,7 @@ BloomFilter::get_hash_indexes(const std::string &value) const {
   uint64_t h2 = std::hash<std::string>{}("salt" + value);
 
   for (int i = 0; i < num_hashes; i++) {
-    uint64_t index = (h1 + i * h2) % bit_array_size;
-    indexes.push_back(index);
+    indexes.push_back((h1 + i * h2) % bit_array_size);
   }
 
   return indexes;
