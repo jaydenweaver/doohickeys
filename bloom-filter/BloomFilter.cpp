@@ -26,6 +26,7 @@ optimal number of hash functions is calculated via the following:
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
+#include <functional>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -45,6 +46,22 @@ int get_bit_array_size(const int n, const double p) {
 
 int get_num_hashes(const int m, const int n) {
   return static_cast<int>(std::ceil(((double)m / n) * LN_2));
+}
+
+std::vector<uint64_t> get_hash_indexes(const std::string &value, int num_hashes,
+                                       int bit_array_size) {
+  std::vector<uint64_t> indexes;
+  indexes.reserve(num_hashes);
+
+  uint64_t h1 = std::hash<std::string>{}(value);
+  uint64_t h2 = std::hash<std::string>{}("salt" + value);
+
+  for (int i = 0; i < num_hashes; i++) {
+    uint64_t index = (h1 + i * h2) % bit_array_size;
+    indexes.push_back(index);
+  }
+
+  return indexes;
 }
 
 int main(int argc, char *argv[]) {
