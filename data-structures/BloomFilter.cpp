@@ -71,7 +71,7 @@ BloomFilter::get_hash_indexes(const std::string &value) const {
   uint64_t h2 = std::hash<std::string>{}("salt" + value);
 
   for (int i = 0; i < num_hashes; i++) {
-    indexes.push_back((h1 + i * h2) % bit_array_size);
+    indexes.emplace_back((h1 + i * h2) % bit_array_size);
   }
 
   return indexes;
