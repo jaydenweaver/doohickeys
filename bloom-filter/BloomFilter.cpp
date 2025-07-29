@@ -4,19 +4,22 @@ BLOOM FILTER IMPLEMENTATION
 ---------------------------------------------------------
 
 optimal bit array size is calculated via the following:
-m = (-n * ln(p)) / ln(2)^2
+  m = (-n * ln(p)) / (ln(2))^2
 
 where:
-m = bit array size
-n = input size
-p = false positive probability
+  m = bit array size
+  n = input size
+  p = false positive probability
 
 NOTE:
-p value of:
-0.1 = ~5 bits per element
-0.01 = ~10 bits per element
-0.001 = ~14 bits per element
-0.0001 = ~19 bits per element
+  p = 0.1 = ~4.8 bits per element
+  p = 0.01 = ~9.6 bits per element
+  p = 0.001 = ~14.4 bits per element
+  p = 0.0001 = ~19.2 bits per element
+
+optimal number of hash functions is calculated via the following:
+  k = (m / n) * ln(2)
+  where k is the number of hash functions
 
 */
 
