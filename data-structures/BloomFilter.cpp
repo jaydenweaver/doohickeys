@@ -25,10 +25,7 @@ optimal number of hash functions is calculated via the following:
 
 #include <cmath>
 #include <cstdint>
-#include <cstdlib>
 #include <functional>
-#include <iostream>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -40,13 +37,13 @@ constexpr double LN_2_SQUARED = 0.48045301391;
 
 class BloomFilter {
 private:
-  std::vector<uint64_t> bits;
   int bit_array_size;
   int num_hashes;
   int buckets;
+  std::vector<uint64_t> bits;
 
-  std::vector<uint64_t> get_hash_indexes(const std::string &value,
-                                         int num_hashes, int bit_array_size);
+  // uses a standard double hash
+  std::vector<uint64_t> get_hash_indexes(const std::string &value) const;
 
 public:
   BloomFilter(int n, double p);
@@ -55,19 +52,16 @@ public:
   bool contains(const std::string &value) const;
 };
 
-bool parse_arg(const char *arg, int &n);
+// n must be greater than 0, p must be within range, 0 -> 1
+BloomFilter::BloomFilter(int n, double p)
+    : bit_array_size(
+          static_cast<int>(std::ceil(-((n * std::log(p)) / LN_2_SQUARED)))),
+      num_hashes(
+          static_cast<int>(std::ceil(((double)bit_array_size / n) * LN_2))),
+      buckets((bit_array_size + 63) / 64), bits(buckets) {}
 
-BloomFilter::BloomFilter(int n, double p) {
-  bit_array_size =
-      static_cast<int>(std::ceil(-((n * std::log(p)) / LN_2_SQUARED)));
-  num_hashes = static_cast<int>(std::ceil(((double)bit_array_size / n) * LN_2));
-  buckets = (bit_array_size + 63) / 64;
-}
-
-// uses a standard double hash
-std::vector<uint64_t> BloomFilter::get_hash_indexes(const std::string &value,
-                                                    int num_hashes,
-                                                    int bit_array_size) {
+std::vector<uint64_t>
+BloomFilter::get_hash_indexes(const std::string &value) const {
   std::vector<uint64_t> indexes;
   indexes.reserve(num_hashes);
 
@@ -82,32 +76,24 @@ std::vector<uint64_t> BloomFilter::get_hash_indexes(const std::string &value,
   return indexes;
 }
 
-int main(int argc, char *argv[]) {
-  int n = DEFAULT_N;
-  double p = DEFAULT_P;
-
-  if (argc > 1) {
-    if (!parse_arg(argv[1], n))
-      return EXIT_FAILURE;
+void BloomFilter::insert(const std::string &value) {
+  std::vector<uint64_t> indexes = get_hash_indexes(value);
+  for (uint64_t index : indexes) {
+    int bucket = index / 64;
+    int index_in_bucket = index % 64;
+    bits[bucket] |= (1ULL << index_in_bucket);
   }
-  return 0;
 }
 
-bool parse_arg(const char *arg, int &n) {
-  try {
-    n = stoi(std::string(arg));
-  } catch (const std::invalid_argument &e) {
-    std::cerr << "invalid argument!" << std::endl;
-    return false;
-  } catch (const std::out_of_range &e) {
-    std::cerr << "number for 'n' too large!" << std::endl;
-    return false;
-  }
+bool BloomFilter::contains(const std::string &value) const {
+  std::vector<uint64_t> indexes = get_hash_indexes(value);
+  for (uint64_t index : indexes) {
+    int bucket = index / 64;
+    int index_in_bucket = index % 64;
 
-  if (n < 1) {
-    std::cerr << "'n' must be greater than 0!" << std::endl;
-    return false;
+    if ((bits[bucket] & (1ULL << index_in_bucket)) == 0) {
+      return false;
+    }
   }
-
   return true;
 }
