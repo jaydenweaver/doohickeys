@@ -3,13 +3,14 @@
 BLOOM FILTER IMPLEMENTATION
 ---------------------------------------------------------
 
-optimal bit array size is calculated via the following, where:
+optimal bit array size is calculated via the following:
 
+m = (-n * ln(p)) / ln(2)^2
+
+where:
 m = bit array size
 n = input size
 p = false positive probability
-
-m = (-n * ln(p)) / ln(2)^2
 
 NOTE:
 p value of:
