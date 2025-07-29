@@ -49,12 +49,14 @@ int get_num_hashes(const int &m, const int &n) {
 int main(int argc, char *argv[]) {
   std::vector<uint64_t> bits;
   int n = DEFAULT_N;
-
+  double p = DEFAULT_P;
   if (argc > 1) {
     if (!parse_arg(argv[1], n))
       return 0;
   }
-  std::cout << "n: " << n << std::endl;
+  std::cout << "n: " << n << ", bit array size: " << get_bit_array_size(n, p)
+            << ", hashes: " << get_num_hashes(get_bit_array_size(n, p), n)
+            << std::endl;
   return 0;
 }
 
