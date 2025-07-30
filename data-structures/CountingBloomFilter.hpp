@@ -28,33 +28,33 @@ optimal number of hash functions is calculated via the following:
 #include <cstdint>
 #include <functional>
 #include <stdexcept>
-#include <string>
 #include <vector>
 
 constexpr double LN_2 = 0.69314718056;
 constexpr double LN_2_SQUARED = 0.48045301391;
 
-class CountingBloomFilter {
+template <typename T> class CountingBloomFilter {
 private:
   int array_size;
   int num_hashes;
   int buckets;
   std::vector<uint64_t> bits;
 
-  void operate(bool remove, const std::string &value);
+  void operate(bool remove, const T &value);
   // uses a standard double hash
-  std::vector<uint64_t> get_hash_indexes(const std::string &value) const;
+  std::vector<uint64_t> get_hash_indexes(const T &value) const;
 
 public:
   CountingBloomFilter(int n, double p);
 
-  void insert(const std::string &value) { operate(false, value); }
-  void remove(const std::string &value) { operate(true, value); }
-  bool contains(const std::string &value) const;
+  void insert(const T &value) { operate(false, value); }
+  void remove(const T &value) { operate(true, value); }
+  bool contains(const T &value) const;
 };
 
 // n must be greater than 0, p must be within range, 0 -> 1
-CountingBloomFilter::CountingBloomFilter(int n, double p)
+template <typename T>
+CountingBloomFilter<T>::CountingBloomFilter(int n, double p)
     : array_size(
           static_cast<int>(std::ceil(-((n * std::log(p)) / LN_2_SQUARED)))),
       num_hashes(static_cast<int>(std::ceil(((double)array_size / n) * LN_2))),
@@ -64,13 +64,14 @@ CountingBloomFilter::CountingBloomFilter(int n, double p)
   }
 }
 
+template <typename T>
 std::vector<uint64_t>
-CountingBloomFilter::get_hash_indexes(const std::string &value) const {
+CountingBloomFilter<T>::get_hash_indexes(const T &value) const {
   std::vector<uint64_t> indexes;
   indexes.reserve(num_hashes);
 
-  uint64_t h1 = std::hash<std::string>{}(value);
-  uint64_t h2 = std::hash<std::string>{}("salt" + value);
+  uint64_t h1 = std::hash<T>{}(value);
+  uint64_t h2 = std::hash<std::pair<T, int>>{}({value, 123});
 
   for (int i = 0; i < num_hashes; i++) {
     indexes.emplace_back((h1 + i * h2) % array_size);
@@ -79,7 +80,8 @@ CountingBloomFilter::get_hash_indexes(const std::string &value) const {
   return indexes;
 }
 
-void CountingBloomFilter::operate(bool remove, const std::string &value) {
+template <typename T>
+void CountingBloomFilter<T>::operate(bool remove, const T &value) {
   std::vector<uint64_t> indexes = get_hash_indexes(value);
   for (uint64_t index : indexes) {
     int bucket = index / 8;
@@ -99,7 +101,8 @@ void CountingBloomFilter::operate(bool remove, const std::string &value) {
   }
 }
 
-bool CountingBloomFilter::contains(const std::string &value) const {
+template <typename T>
+bool CountingBloomFilter<T>::contains(const T &value) const {
   std::vector<uint64_t> indexes = get_hash_indexes(value);
   for (uint64_t index : indexes) {
     int bucket = index / 8;

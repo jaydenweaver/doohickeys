@@ -15,20 +15,20 @@
 
 #include <vector>
 
-struct Node {
+template <typename T> struct Node {
   int key;
   std::vector<Node *> forward;
 
   Node(int key, int level) : key(key), forward(level, nullptr) {}
 };
 
-class SkipList {
+template <typename T> class SkipList {
 private:
   const double P = 0.5;
   const int MAX_LEVEL = 15;
 
   int level = 0;
-  Node *head;
+  Node<T> *head;
 
   int assign_level();
 
@@ -38,5 +38,11 @@ public:
 
   void insert(int key);
   void remove(int key);
-  Node *search(int key);
+  Node<T> *search(int key);
 };
+
+template <typename T> int SkipList<T>::assign_level() {
+  int level = 0;
+  while (level < MAX_LEVEL) {
+  }
+}
