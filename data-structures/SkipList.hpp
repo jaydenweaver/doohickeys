@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include <random>
 #include <vector>
 
 template <typename T> struct Node {
@@ -43,6 +44,13 @@ public:
 
 template <typename T> int SkipList<T>::assign_level() {
   int level = 0;
-  while (level < MAX_LEVEL) {
-  }
+
+  std::random_device rand;
+  std::mt19937 gen(rand());
+  std::uniform_real_distribution<double> uniform(0.0, 1.0);
+
+  while (uniform(gen) < P && level < MAX_LEVEL)
+    level++;
+
+  return level;
 }
