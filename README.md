@@ -1,5 +1,4 @@
 a collection of my data structure implementations
-
-have currently completed:
+currently includes:
 - bloom filter
 - counting bloom filter
