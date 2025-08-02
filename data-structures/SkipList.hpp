@@ -39,13 +39,22 @@ private:
   int assign_level();
 
 public:
-  SkipList();
   ~SkipList();
 
   void insert(const T &key);
   void remove(const T &key);
   Node<T> *search(const T &key);
 };
+
+template <typename T> SkipList<T>::~SkipList() {
+  Node<T> *curr = head;
+
+  while (curr) {
+    Node<T> *next = curr->forward[0];
+    delete curr;
+    curr = next;
+  }
+}
 
 template <typename T> int SkipList<T>::assign_level() {
   int level = 1;
@@ -61,15 +70,13 @@ template <typename T> int SkipList<T>::assign_level() {
 }
 
 template <typename T> void SkipList<T>::insert(const T &key) {
-  int level = assign_level();
-
-  if (head == nullptr) {
-    head = new Node<T>(key, level);
+  if (search(key))
     return;
-  }
+
+  int curr_level = assign_level();
 
   Node<T> *curr = head;
-  std::vector<Node<T> *> list(this->level, nullptr);
+  std::vector<Node<T> *> list(MAX_LEVEL, nullptr);
 
   for (int i = level - 1; i >= 0; i--) {
     while (curr->forward[i] && key > curr->forward[i]->key) {
@@ -78,23 +85,48 @@ template <typename T> void SkipList<T>::insert(const T &key) {
     list[i] = curr;
   }
 
-  Node<T> *node = new Node<T>(key, level);
+  Node<T> *node = new Node<T>(key, curr_level);
 
-  for (int i = 0; i < level; i++) {
+  if (curr_level > level)
+    level = curr_level;
+
+  for (int i = 0; i < curr_level; i++) {
     node->forward[i] = list[i]->forward[i];
     list[i]->forward[i] = node;
   }
-
-  if (level > this->level)
-    this->level = level;
 }
 
-template <typename T> void SkipList<T>::remove(const T &key) {}
+template <typename T> void SkipList<T>::remove(const T &key) {
+  Node<T> *curr = head;
+  std::vector<Node<T> *> list(MAX_LEVEL, nullptr);
+
+  for (int i = level - 1; i >= 0; i--) {
+    while (curr->forward[i] && curr->forward[i]->key < key) {
+      curr = curr->forward[i];
+    }
+    list[i] = curr;
+  }
+
+  curr = curr->forward[0];
+  if (!curr || curr->key != key)
+    return;
+
+  for (int i = 0; i < level; i++) {
+    if (list[i]->forward[i] != curr)
+      break;
+    list[i]->forward[i] = curr->forward[i];
+  }
+
+  delete curr;
+
+  while (level > 1 && head->forward[level - 1] == nullptr)
+    level--;
+}
 
 template <typename T> Node<T> *SkipList<T>::search(const T &key) {
   Node<T> *curr = head;
 
-  for (int i = level - 1; i > 0; i--) {
+  for (int i = level - 1; i >= 0; i--) {
     while (curr->forward[i] && curr->forward[i]->key < key)
       curr = curr->forward[i];
   }
