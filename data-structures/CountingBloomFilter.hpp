@@ -1,7 +1,7 @@
 #pragma once
 /*
 
-COUNTING BLOOM FILTER IMPLEMENTATION - currently only supports strings
+COUNTING BLOOM FILTER IMPLEMENTATION
 ---------------------------------------------------------
 
 optimal bit array size is calculated via the following:
@@ -34,6 +34,9 @@ constexpr double LN_2 = 0.69314718056;
 constexpr double LN_2_SQUARED = 0.48045301391;
 
 template <typename T> class CountingBloomFilter {
+  static_assert(std::is_default_constructible_v<std::hash<T>>,
+                "type T must be hashable (std::hash<T> must be defined)");
+
 private:
   int array_size;
   int num_hashes;
