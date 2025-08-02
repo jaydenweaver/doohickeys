@@ -1,6 +1,11 @@
-a collection of my data structure implementations
+a collection of my data structure implementations.
+
+these implementations are created primarily to allow me to better understand the 'what, why and when' of these structures.
 
 currently includes:
-- bloom filter            | template (must be hashable)
-- counting bloom filter   | template (must be hashable)
-- skip list               | unique, template (requires < operator support)
+
+| data structure          | properties                     |
+|------------------------|--------------------------------|
+| bloom filter           | template, requires hashable    |
+| counting bloom filter  | template, requires hashable    |
+| skip list              | template, unique, requires `<` support |
