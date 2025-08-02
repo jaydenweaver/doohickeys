@@ -88,3 +88,19 @@ template <typename T> void SkipList<T>::insert(const T &key) {
   if (level > this->level)
     this->level = level;
 }
+
+template <typename T> void SkipList<T>::remove(const T &key) {}
+
+template <typename T> Node<T> *SkipList<T>::search(const T &key) {
+  Node<T> *curr = head;
+
+  for (int i = level - 1; i > 0; i--) {
+    while (curr->forward[i] && curr->forward[i]->key < key)
+      curr = curr->forward[i];
+  }
+
+  curr = curr->forward[0];
+  if (curr && curr->key == key)
+    return curr;
+  return nullptr;
+}
